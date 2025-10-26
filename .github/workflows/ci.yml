@@ -1,9 +1,11 @@
-name: "Test"
+name: "Continuous Integration"
 
 on:
   push:
     branches:
       - main
+    tags:
+      - v*
   pull_request:
     branches:
       - main
@@ -11,6 +13,7 @@ on:
 jobs:
   coverage:
     runs-on: ubuntu-latest
+    if: ${{ ! startsWith(github.ref, 'refs/tags/v') }}
     permissions:
       pull-requests: write
     steps:
@@ -43,6 +46,7 @@ jobs:
 
   lint:
     runs-on: ubuntu-latest
+    if: ${{ ! startsWith(github.ref, 'refs/tags/v') }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -71,3 +75,24 @@ jobs:
         run: uv python install ${{ matrix.python-version }}
       - name: Run tests
         run: uv run pytest
+
+  publish:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    environment:
+      name: pypi
+    permissions:
+      id-token: write
+    needs:
+      - test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+      - name: Install python 3.12
+        run: uv python install 3.12
+      - name: Build package
+        run: uv build
+      - name: Publish package
+        run: uv publish
