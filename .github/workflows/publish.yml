@@ -1,9 +1,9 @@
 name: "Publish"
 
 on:
-  tag:
-    types:
-      - created
+  push:
+    tags:
+      - v*
 
 jobs:
   publish:
