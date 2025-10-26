@@ -1,0 +1,12 @@
+__pycache__/
+.coverage
+.ruff_cache/
+.tjost.yaml
+.venv/
+.vscode/
+*.egg-info/
+*.pyc
+build/
+coverage.*
+dist/
+tmp/
